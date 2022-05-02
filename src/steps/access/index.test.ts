@@ -9,6 +9,17 @@ afterEach(async () => {
   await recording.stop();
 });
 
+test('fetch-organizations', async () => {
+  recording = setupProjectRecording({
+    directory: __dirname,
+    name: 'fetch-organizations',
+  });
+
+  const stepConfig = buildStepTestConfigForStep(Steps.ORGANIZATIONS);
+  const stepResult = await executeStepWithDependencies(stepConfig);
+  expect(stepResult).toMatchStepMetadata(stepConfig);
+});
+
 test('fetch-users', async () => {
   recording = setupProjectRecording({
     directory: __dirname,
@@ -31,10 +42,23 @@ test('fetch-groups', async () => {
   expect(stepResult).toMatchStepMetadata(stepConfig);
 });
 
-test('build-user-group-relationships', async () => {
+test('build-account-organization-relationships', async () => {
   recording = setupProjectRecording({
     directory: __dirname,
-    name: 'build-user-group-relationships',
+    name: 'build-account-organization-relationships',
+  });
+
+  const stepConfig = buildStepTestConfigForStep(
+    Steps.ACCOUNT_ORGANIZATION_RELATIONSHIPS,
+  );
+  const stepResult = await executeStepWithDependencies(stepConfig);
+  expect(stepResult).toMatchStepMetadata(stepConfig);
+});
+
+test('build-group-user-relationships', async () => {
+  recording = setupProjectRecording({
+    directory: __dirname,
+    name: 'build-group-user-relationships',
   });
 
   const stepConfig = buildStepTestConfigForStep(Steps.GROUP_USER_RELATIONSHIPS);

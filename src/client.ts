@@ -1,9 +1,25 @@
-import http from 'http';
-
-import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
+import fetch from 'node-fetch';
+import {
+  IntegrationProviderAPIError,
+  IntegrationProviderAuthenticationError,
+} from '@jupiterone/integration-sdk-core';
+import { retry } from '@lifeomic/attempt';
 
 import { IntegrationConfig } from './config';
-import { AcmeUser, AcmeGroup } from './types';
+import {
+  Pageable,
+  PageableV2,
+  SonarCloudAuthResponse,
+  SonarCloudGroupUsersResponse,
+  SonarCloudIssue,
+  SonarCloudIssuesResponse,
+  SonarCloudProject,
+  SonarCloudProjectsResponse,
+  SonarCloudUser,
+  SonarCloudUserGroup,
+  SonarCloudUserGroupsResponse,
+  SonarCloudUsersResponse,
+} from './types';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
@@ -18,104 +34,213 @@ export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 export class APIClient {
   constructor(readonly config: IntegrationConfig) {}
 
+  private withBaseUri = (path: string) => `https://sonarcloud.io/api${path}`;
+
   public async verifyAuthentication(): Promise<void> {
-    // TODO make the most light-weight request possible to validate
-    // authentication works with the provided credentials, throw an err if
-    // authentication fails
-    const request = new Promise<void>((resolve, reject) => {
-      http.get(
-        {
-          hostname: 'localhost',
-          port: 443,
-          path: '/api/v1/some/endpoint?limit=1',
-          agent: false,
-          timeout: 10,
-        },
-        (res) => {
-          if (res.statusCode !== 200) {
-            reject(new Error('Provider authentication failed'));
-          } else {
-            resolve();
-          }
-        },
-      );
+    const response = await fetch(this.withBaseUri('/authentication/validate'), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(
+          `${this.config.clientSecret}:`,
+        ).toString('base64')}`,
+      },
     });
 
-    try {
-      await request;
-    } catch (err) {
+    const body: SonarCloudAuthResponse = await response.json();
+
+    if (!response.ok || !body.valid) {
       throw new IntegrationProviderAuthenticationError({
-        cause: err,
-        endpoint: 'https://localhost/api/v1/some/endpoint?limit=1',
+        cause: new Error('Provider authentication failed'),
+        endpoint: this.withBaseUri('/authentication/validate'),
+        status: 401,
+        statusText: 'Unauthorized',
+      });
+    }
+  }
+
+  private async getRequest<T>(endpoint: string): Promise<T> {
+    try {
+      const options = {
+        method: 'GET',
+        headers: {
+          Authorization: `Basic ${Buffer.from(
+            `${this.config.clientSecret}:`,
+          ).toString('base64')}`,
+        },
+      };
+
+      const response = await retry(async () => await fetch(endpoint, options), {
+        delay: 5000,
+        maxAttempts: 10,
+        handleError: (err, context) => {
+          if (
+            err.statusCode !== 429 ||
+            ([500, 502, 503].includes(err.statusCode) && context.attemptNum > 1)
+          )
+            context.abort();
+        },
+      });
+
+      return response.json();
+    } catch (err) {
+      throw new IntegrationProviderAPIError({
+        endpoint,
         status: err.status,
         statusText: err.statusText,
       });
     }
   }
 
-  /**
-   * Iterates each user resource in the provider.
-   *
-   * @param iteratee receives each resource to produce entities/relationships
-   */
-  public async iterateUsers(
-    iteratee: ResourceIteratee<AcmeUser>,
+  private async paginatedGetRequest<S extends Pageable | PageableV2, T>(
+    endpoint: string,
+    resourceGetter: (response: S) => T[],
+    iteratee: ResourceIteratee<T>,
   ): Promise<void> {
-    // TODO paginate an endpoint, invoke the iteratee with each record in the
-    // page
-    //
-    // The provider API will hopefully support pagination. Functions like this
-    // should maintain pagination state, and for each page, for each record in
-    // the page, invoke the `ResourceIteratee`. This will encourage a pattern
-    // where each resource is processed and dropped from memory.
+    let proceed = false;
+    let page = 1;
 
-    const users: AcmeUser[] = [
-      {
-        id: 'acme-user-1',
-        name: 'User One',
-      },
-      {
-        id: 'acme-user-2',
-        name: 'User Two',
-      },
-    ];
+    try {
+      do {
+        const response = await this.getRequest<S>(
+          `${this.withBaseUri(endpoint)}&p=${page}`,
+        );
 
-    for (const user of users) {
-      await iteratee(user);
+        for (const user of resourceGetter(response)) {
+          await iteratee(user);
+        }
+
+        if (
+          (response as any).p &&
+          (response as any).ps &&
+          (response as any).total
+        ) {
+          const actualResponse = response as PageableV2;
+
+          proceed = actualResponse.p * actualResponse.ps < actualResponse.total;
+        } else {
+          const actualResponse = response as Pageable;
+
+          proceed =
+            actualResponse.paging.pageIndex * actualResponse.paging.pageSize <
+            actualResponse.paging.total;
+        }
+
+        page++;
+      } while (proceed);
+    } catch (err) {
+      throw new IntegrationProviderAPIError({
+        cause: new Error(err.message),
+        endpoint,
+        status: err.statusCode,
+        statusText: err.message,
+      });
     }
   }
 
   /**
-   * Iterates each group resource in the provider.
+   * Iterates each organization in the provider.
    *
    * @param iteratee receives each resource to produce entities/relationships
    */
-  public async iterateGroups(
-    iteratee: ResourceIteratee<AcmeGroup>,
+  public async iterateOrganizations(
+    iteratee: ResourceIteratee<string>,
   ): Promise<void> {
-    // TODO paginate an endpoint, invoke the iteratee with each record in the
-    // page
-    //
-    // The provider API will hopefully support pagination. Functions like this
-    // should maintain pagination state, and for each page, for each record in
-    // the page, invoke the `ResourceIteratee`. This will encourage a pattern
-    // where each resource is processed and dropped from memory.
-
-    const groups: AcmeGroup[] = [
-      {
-        id: 'acme-group-1',
-        name: 'Group One',
-        users: [
-          {
-            id: 'acme-user-1',
-          },
-        ],
-      },
-    ];
-
-    for (const group of groups) {
-      await iteratee(group);
+    for (const organization of this.config.clientOrganizations
+      .trim()
+      .split(',')) {
+      await iteratee(organization.trim());
     }
+  }
+
+  /**
+   * Iterates each user from the provided organization.
+   *
+   * @param organization the organization from which to iterate users
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateOrganizationUsers(
+    organization: string,
+    iteratee: ResourceIteratee<SonarCloudUser>,
+  ): Promise<void> {
+    await this.paginatedGetRequest<SonarCloudUsersResponse, SonarCloudUser>(
+      `/organizations/search_members?organization=${organization}`,
+      (res) => res.users,
+      iteratee,
+    );
+  }
+
+  /**
+   * Iterates each user from the provided group.
+   *
+   * @param groupId the group from which to iterate users
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateGroupUsers(
+    groupId: number,
+    iteratee: ResourceIteratee<SonarCloudUser>,
+  ): Promise<void> {
+    await this.paginatedGetRequest<
+      SonarCloudGroupUsersResponse,
+      SonarCloudUser
+    >(`/user_groups/users?id=${groupId}`, (res) => res.users, iteratee);
+  }
+
+  /**
+   * Iterates each group group from the provided organization.
+   *
+   * @param organization the organization from which to iterate groups
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateOrganizationGroups(
+    organization: string,
+    iteratee: ResourceIteratee<SonarCloudUserGroup>,
+  ): Promise<void> {
+    await this.paginatedGetRequest<
+      SonarCloudUserGroupsResponse,
+      SonarCloudUserGroup
+    >(
+      `/user_groups/search?organization=${organization}`,
+      (res) => res.groups,
+      iteratee,
+    );
+  }
+
+  /**
+   * Iterates each project resource belonging to provided organization.
+   *
+   * @param organization the organization from which to iterate projects
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateOrganizationProjects(
+    organization: string,
+    iteratee: ResourceIteratee<SonarCloudProject>,
+  ): Promise<void> {
+    await this.paginatedGetRequest<
+      SonarCloudProjectsResponse,
+      SonarCloudProject
+    >(
+      `/projects/search?organization=${organization}`,
+      (res) => res.components,
+      iteratee,
+    );
+  }
+
+  /**
+   * Iterates each issue resource belonging to provided organization.
+   *
+   * @param organization the organization from which to iterate issues
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateProjectIssues(
+    project: string,
+    iteratee: ResourceIteratee<SonarCloudIssue>,
+  ): Promise<void> {
+    await this.paginatedGetRequest<SonarCloudIssuesResponse, SonarCloudIssue>(
+      `/issues/search?projects=${project}`,
+      (res) => res.issues,
+      iteratee,
+    );
   }
 }
 

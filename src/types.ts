@@ -1,25 +1,76 @@
-// Providers often supply types with their API libraries.
-
-export interface AcmeUser {
-  id: string;
-  name: string;
+export interface Pageable {
+  paging: {
+    pageIndex: number;
+    pageSize: number;
+    total: number;
+  };
 }
 
-export interface AcmeGroup {
-  id: string;
-  name: string;
-  users?: Pick<AcmeUser, 'id'>[];
+export interface PageableV2 {
+  p: number;
+  ps: number;
+  total: number;
 }
 
-// Those can be useful to a degree, but often they're just full of optional
-// values. Understanding the response data may be more reliably accomplished by
-// reviewing the API response recordings produced by testing the wrapper client
-// (./client.ts). However, when there are no types provided, it is necessary to define
-// opaque types for each resource, to communicate the records that are expected
-// to come from an endpoint and are provided to iterating functions.
+// https://sonarcloud.io/api/authentication/validate
+export interface SonarCloudAuthResponse {
+  valid: boolean;
+}
 
-/*
-import { Opaque } from 'type-fest';
-export type AcmeUser = Opaque<any, 'AcmeUser'>;
-export type AcmeGroup = Opaque<any, 'AcmeGroup'>;
-*/
+export interface SonarCloudProject {
+  organization: string;
+  key: string;
+  name: string;
+  qualifier: string;
+  visibility: 'public' | 'private';
+}
+
+// https://sonarcloud.io/api/projects/search?organization=<name>
+export interface SonarCloudProjectsResponse extends Pageable {
+  components: SonarCloudProject[];
+}
+
+export interface SonarCloudUser {
+  login: string;
+  name: string;
+  avatar: string;
+  groupCount: number;
+  isOrgAdmin: boolean;
+}
+
+// https://sonarcloud.io/api/organizations/search_members?organization=<name>
+export interface SonarCloudUsersResponse extends Pageable {
+  users: SonarCloudUser[];
+}
+
+export interface SonarCloudUserGroup {
+  id: number;
+  name: string;
+  description: string;
+  membersCount: number;
+  default: boolean;
+}
+
+// https://sonarcloud.io/api/user_groups/search?organization=<name>
+export interface SonarCloudUserGroupsResponse extends Pageable {
+  groups: SonarCloudUserGroup[];
+}
+
+// https://sonarcloud.io/api/user_groups/?id=<id>
+export interface SonarCloudGroupUsersResponse extends PageableV2 {
+  users: SonarCloudUser[];
+}
+
+export interface SonarCloudIssue {
+  key: string;
+  component: string;
+  project: string;
+  status: string;
+  severity: string;
+  creationDate: string;
+  updateDate: string;
+}
+
+export interface SonarCloudIssuesResponse extends Pageable {
+  issues: SonarCloudIssue[];
+}
