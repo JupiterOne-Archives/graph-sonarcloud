@@ -4,6 +4,7 @@ import {
   Entity,
   RelationshipClass,
   Relationship,
+  parseTimePropertyValue,
 } from '@jupiterone/integration-sdk-core';
 
 import { SonarCloudProject } from '../../types';
@@ -21,7 +22,9 @@ export function createProjectEntity(project: SonarCloudProject): Entity {
         _key: id,
         key: project.name,
         name: project.name,
-        visibility: project.visibility,
+        public: project.visibility === 'public',
+        qualifier: project.qualifier,
+        lastAnalysisDate: parseTimePropertyValue(project.lastAnalysisDate),
       },
     },
   });

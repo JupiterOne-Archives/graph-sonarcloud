@@ -1,5 +1,4 @@
 import {
-  Entity,
   IntegrationStep,
   IntegrationStepExecutionContext,
   IntegrationMissingKeyError,
@@ -9,49 +8,14 @@ import {
 import { createAPIClient } from '../../client';
 import { IntegrationConfig } from '../../config';
 import { SonarCloudUserGroup } from '../../types';
-import { ACCOUNT_ENTITY_KEY } from '../account';
 import { Entities, Steps, Relationships } from '../constants';
+import { getOrganizationKey } from '../organizations/converter';
+import { getUserKey } from '../users/converter';
 import {
-  createAccountOrganizationRelationship,
-  createAccountUserRelationship,
   createGroupEntity,
   createGroupUserRelationship,
-  createOrganizationEntity,
   createOrganizationGroupRelationship,
-  createUserEntity,
-  getOrganizationKey,
-  getUserKey,
 } from './converter';
-
-export async function fetchOrganizations({
-  instance,
-  jobState,
-}: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
-
-  await apiClient.iterateOrganizations(async (organization) => {
-    await jobState.addEntity(createOrganizationEntity(organization));
-  });
-}
-
-export async function fetchUsers({
-  instance,
-  jobState,
-}: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
-
-  const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
-
-  await apiClient.iterateOrganizations(async (organization) => {
-    await apiClient.iterateOrganizationUsers(organization, async (user) => {
-      const userEntity = await jobState.addEntity(createUserEntity(user));
-
-      await jobState.addRelationship(
-        createAccountUserRelationship(accountEntity, userEntity),
-      );
-    });
-  });
-}
 
 export async function fetchGroups({
   instance,
@@ -76,30 +40,6 @@ export async function fetchGroups({
         createOrganizationGroupRelationship(organizationEntity, groupEntity),
       );
     });
-  });
-}
-
-export async function buildAccountOrganizationRelationships({
-  instance,
-  jobState,
-}: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
-
-  const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
-
-  await apiClient.iterateOrganizations(async (organization) => {
-    const organizationKey = getOrganizationKey(organization);
-    const organizationEntity = await jobState.findEntity(organizationKey);
-
-    if (!organizationEntity) {
-      throw new IntegrationMissingKeyError(
-        `Expected organization with key to exist (key=${organizationKey})`,
-      );
-    }
-
-    await jobState.addRelationship(
-      createAccountOrganizationRelationship(accountEntity, organizationEntity),
-    );
   });
 }
 
@@ -141,23 +81,7 @@ export async function buildGroupUserRelationships({
   );
 }
 
-export const accessSteps: IntegrationStep<IntegrationConfig>[] = [
-  {
-    id: Steps.ORGANIZATIONS,
-    name: 'Fetch Organizations',
-    entities: [Entities.ORGANIZATION],
-    relationships: [],
-    dependsOn: [],
-    executionHandler: fetchOrganizations,
-  },
-  {
-    id: Steps.USERS,
-    name: 'Fetch Users',
-    entities: [Entities.USER],
-    relationships: [Relationships.ACCOUNT_HAS_USER],
-    dependsOn: [Steps.ACCOUNT],
-    executionHandler: fetchUsers,
-  },
+export const groupSteps: IntegrationStep<IntegrationConfig>[] = [
   {
     id: Steps.GROUPS,
     name: 'Fetch Groups',
@@ -165,14 +89,6 @@ export const accessSteps: IntegrationStep<IntegrationConfig>[] = [
     relationships: [Relationships.ORGANIZATION_HAS_GROUP],
     dependsOn: [Steps.ORGANIZATIONS],
     executionHandler: fetchGroups,
-  },
-  {
-    id: Steps.ACCOUNT_ORGANIZATION_RELATIONSHIPS,
-    name: 'Build Account -> Organization Relationships',
-    entities: [],
-    relationships: [Relationships.ACCOUNT_HAS_ORGANIZATION],
-    dependsOn: [Steps.ACCOUNT, Steps.ORGANIZATIONS],
-    executionHandler: buildAccountOrganizationRelationships,
   },
   {
     id: Steps.GROUP_USER_RELATIONSHIPS,

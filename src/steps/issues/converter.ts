@@ -4,6 +4,7 @@ import {
   Entity,
   RelationshipClass,
   Relationship,
+  parseTimePropertyValue,
 } from '@jupiterone/integration-sdk-core';
 
 import { SonarCloudIssue } from '../../types';
@@ -22,6 +23,12 @@ export function createIssueEntity(issue: SonarCloudIssue): Entity {
         name: issue.component,
         status: issue.status,
         severity: issue.severity,
+        message: issue.message,
+        effort: issue.effort,
+        debt: issue.debt,
+        createdOn: parseTimePropertyValue(issue.creationDate),
+        updatedOn: parseTimePropertyValue(issue.updateDate),
+        type: issue.type,
       },
     },
   });

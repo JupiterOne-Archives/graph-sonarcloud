@@ -51,6 +51,8 @@ export const Entities: Record<
       properties: {
         name: { type: 'string' },
         description: { type: 'string' },
+        membersCount: { type: 'number' },
+        default: { type: 'boolean' },
       },
       required: ['name'],
     },
@@ -64,9 +66,9 @@ export const Entities: Record<
         username: { type: 'string' },
         name: { type: 'string' },
         active: { type: 'boolean' },
-        admin: { type: 'boolean' },
+        organizationAdmin: { type: 'boolean' },
       },
-      required: ['username', 'name', 'active', 'admin'],
+      required: ['username', 'name', 'active', 'organizationAdmin'],
     },
   },
   PROJECT: {
@@ -77,9 +79,11 @@ export const Entities: Record<
       properties: {
         key: { type: 'string' },
         name: { type: 'string' },
-        visibility: { type: 'string' },
+        public: { type: 'boolean' },
+        qualifier: { type: 'string' },
+        lastAnalysisDate: { type: 'number' },
       },
-      required: ['key', 'name', 'visibility'],
+      required: ['key', 'name', 'public'],
     },
   },
   ISSUE: {
@@ -90,6 +94,12 @@ export const Entities: Record<
       properties: {
         status: { type: 'string' },
         severity: { type: 'string' },
+        message: { type: 'string' },
+        effort: { type: 'string' },
+        debt: { type: 'string' },
+        createdOn: { type: 'number' },
+        updatedOn: { type: 'number' },
+        type: { type: 'string' },
       },
       required: ['status', 'severity'],
     },

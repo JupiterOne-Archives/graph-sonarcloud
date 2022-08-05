@@ -1,7 +1,7 @@
 import { RelationshipClass, StepSpec } from '@jupiterone/integration-sdk-core';
 import { IntegrationConfig } from '../../../../src/config';
 
-export const accountSpec: StepSpec<IntegrationConfig>[] = [
+export const issueSpec: StepSpec<IntegrationConfig>[] = [
   {
     /**
      * ENDPOINT: https://sonarcloud.io/api/issues/search?organization=<name>
@@ -24,7 +24,7 @@ export const accountSpec: StepSpec<IntegrationConfig>[] = [
         targetType: 'sonarcloud_issue',
       },
     ],
-    dependsOn: ['fetch-organizations'],
+    dependsOn: ['fetch-organizations', 'fetch-projects'],
     implemented: true,
   },
 ];

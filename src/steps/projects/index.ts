@@ -6,7 +6,7 @@ import {
 
 import { createAPIClient } from '../../client';
 import { IntegrationConfig } from '../../config';
-import { getOrganizationKey } from '../access/converter';
+import { getOrganizationKey } from '../organizations/converter';
 import { Entities, Relationships, Steps } from '../constants';
 import {
   createOrganizationProjectRelationship,

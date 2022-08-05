@@ -80,7 +80,6 @@ The following entities are created:
 
 | Resources    | Entity `_type`            | Entity `_class` |
 | ------------ | ------------------------- | --------------- |
-| Account      | `sonarcloud_account`      | `Account`       |
 | Issue        | `sonarcloud_issue`        | `Issue`         |
 | Organization | `sonarcloud_organization` | `Organization`  |
 | Project      | `sonarcloud_project`      | `Project`       |
@@ -91,14 +90,12 @@ The following entities are created:
 
 The following relationships are created:
 
-| Source Entity `_type`     | Relationship `_class` | Target Entity `_type`     |
-| ------------------------- | --------------------- | ------------------------- |
-| `sonarcloud_account`      | **HAS**               | `sonarcloud_organization` |
-| `sonarcloud_account`      | **HAS**               | `sonarcloud_user`         |
-| `sonarcloud_group`        | **HAS**               | `sonarcloud_user`         |
-| `sonarcloud_organization` | **HAS**               | `sonarcloud_group`        |
-| `sonarcloud_organization` | **HAS**               | `sonarcloud_project`      |
-| `sonarcloud_project`      | **HAS**               | `sonarcloud_issue`        |
+| Source Entity `_type`     | Relationship `_class` | Target Entity `_type` |
+| ------------------------- | --------------------- | --------------------- |
+| `sonarcloud_group`        | **HAS**               | `sonarcloud_user`     |
+| `sonarcloud_organization` | **HAS**               | `sonarcloud_group`    |
+| `sonarcloud_organization` | **HAS**               | `sonarcloud_project`  |
+| `sonarcloud_project`      | **HAS**               | `sonarcloud_issue`    |
 
 <!--
 ********************************************************************************

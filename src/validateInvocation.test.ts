@@ -21,7 +21,7 @@ describe('#validateInvocation', () => {
     });
 
     await expect(validateInvocation(executionContext)).rejects.toThrow(
-      'Config requires all of {clientOrganizations, clientEmail, clientSecret}',
+      'Config requires all of {clientOrganizations, clientSecret}',
     );
   });
 
@@ -65,7 +65,6 @@ describe('#validateInvocation', () => {
 
         const executionContext = createMockExecutionContext({
           instanceConfig: {
-            clientEmail: integrationConfig.clientEmail,
             clientOrganizations: integrationConfig.clientOrganizations,
             clientSecret: 'INVALID',
           },

@@ -9,28 +9,6 @@ afterEach(async () => {
   await recording.stop();
 });
 
-test('fetch-organizations', async () => {
-  recording = setupProjectRecording({
-    directory: __dirname,
-    name: 'fetch-organizations',
-  });
-
-  const stepConfig = buildStepTestConfigForStep(Steps.ORGANIZATIONS);
-  const stepResult = await executeStepWithDependencies(stepConfig);
-  expect(stepResult).toMatchStepMetadata(stepConfig);
-});
-
-test('fetch-users', async () => {
-  recording = setupProjectRecording({
-    directory: __dirname,
-    name: 'fetch-users',
-  });
-
-  const stepConfig = buildStepTestConfigForStep(Steps.USERS);
-  const stepResult = await executeStepWithDependencies(stepConfig);
-  expect(stepResult).toMatchStepMetadata(stepConfig);
-});
-
 test('fetch-groups', async () => {
   recording = setupProjectRecording({
     directory: __dirname,
@@ -38,19 +16,6 @@ test('fetch-groups', async () => {
   });
 
   const stepConfig = buildStepTestConfigForStep(Steps.GROUPS);
-  const stepResult = await executeStepWithDependencies(stepConfig);
-  expect(stepResult).toMatchStepMetadata(stepConfig);
-});
-
-test('build-account-organization-relationships', async () => {
-  recording = setupProjectRecording({
-    directory: __dirname,
-    name: 'build-account-organization-relationships',
-  });
-
-  const stepConfig = buildStepTestConfigForStep(
-    Steps.ACCOUNT_ORGANIZATION_RELATIONSHIPS,
-  );
   const stepResult = await executeStepWithDependencies(stepConfig);
   expect(stepResult).toMatchStepMetadata(stepConfig);
 });

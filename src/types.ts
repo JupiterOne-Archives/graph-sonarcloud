@@ -23,6 +23,7 @@ export interface SonarCloudProject {
   name: string;
   qualifier: string;
   visibility: 'public' | 'private';
+  lastAnalysisDate: string;
 }
 
 // https://sonarcloud.io/api/projects/search?organization=<name>
@@ -70,6 +71,8 @@ export interface SonarCloudIssue {
   status: string;
   severity: string;
   message: string;
+  effort: string;
+  debt: string;
   creationDate: string;
   updateDate: string;
 }

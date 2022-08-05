@@ -10,12 +10,10 @@ if (process.env.LOAD_ENV) {
     path: path.join(__dirname, '../.env'),
   });
 }
-const DEFAULT_CLIENT_EMAIL = 'dummy@email.com';
 const DEFAULT_CLIENT_ORGANIZATIONS = 'j1-test-organization';
 const DEFAULT_CLIENT_SECRET = 'dummy-acme-client-secret';
 
 export const integrationConfig: IntegrationConfig = {
-  clientEmail: process.env.CLIENT_EMAIL || DEFAULT_CLIENT_EMAIL,
   clientOrganizations:
     process.env.CLIENT_ORGANIZATIONS || DEFAULT_CLIENT_ORGANIZATIONS,
   clientSecret: process.env.CLIENT_SECRET || DEFAULT_CLIENT_SECRET,

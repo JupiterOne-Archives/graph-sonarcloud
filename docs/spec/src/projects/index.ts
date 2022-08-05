@@ -1,7 +1,7 @@
 import { RelationshipClass, StepSpec } from '@jupiterone/integration-sdk-core';
 import { IntegrationConfig } from '../../../../src/config';
 
-export const accountSpec: StepSpec<IntegrationConfig>[] = [
+export const projectSpec: StepSpec<IntegrationConfig>[] = [
   {
     /**
      * ENDPOINT: https://sonarcloud.io/api/projects/search?organization=<name>
