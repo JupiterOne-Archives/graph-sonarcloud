@@ -16,13 +16,17 @@ don't bother documenting that here.
 
 ## Provider account setup
 
-Please provide information about the steps needed to create an account with a
-provider. Images and references to a provider's documentation is very helpful
-for new developers picking up your work.
+1. Generate Token -
+   [Generate an API token](https://sonarcloud.io/account/security)
+2. Supply generated token as `CLIENT_SECRET` env field
+3. Enter the organization name(s) (comma separated if plural) as
+   `CLIENT_ORGANIZATIONS` env field that you wish to be ingested
 
 ## Authentication
 
-Supply details here for information on how to authenticate with a provider so
-that developers have an idea of what's needed to hit APIs. It may be useful to
-provide explanations for each value specified in the
-[`IntegrationInstanceConfigFieldMap`](../src/config.ts).
+Copy the .env.example to .env file and fill in the variables using the user
+information and API token information generated from instructions above. The
+mapping is as follows:
+
+CLIENT_SECRET= ${API token} CLIENT_ORGANIZATIONS= ${organization(s) that you
+wish to be ingested/iterated}
