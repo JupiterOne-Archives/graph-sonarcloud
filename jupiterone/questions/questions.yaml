@@ -1,15 +1,15 @@
 ---
-sourceId: managed:template
+sourceId: managed:sonarcloud
 integrationDefinitionId: '${integration_definition_id}'
-questions: []
-  # - id: integration-question-template-replace-me
-  #   title: What kinds of questions will this integration support?
-  #   description:
-  #     TODO Every integration should contribute questions! Please be carefule
-  #     to replace this before deploying the integration to JupiterOne.
-  #   queries:
-  #     - name: good
-  #       query: |
-  #         find * with _integrationDefinitionId = '${integration_definition_id}'
-  #   tags:
-  #     - template
+questions: 
+- id: managed-question-sonarcloud-major-bug-issues
+  title: What are the major SonarCloud bug issues?
+  description:
+    Return a list of SonarCloud's major bug issues.
+  queries:
+   - name: SonarCloud Major Bugs
+     query: |
+       FIND UNIQUE sonarcloud_issue WITH (status ~= "OPEN" AND severity ~= "MAJOR" AND type ~= "BUG")
+  tags:
+   - issue
+   - sonarcloud
