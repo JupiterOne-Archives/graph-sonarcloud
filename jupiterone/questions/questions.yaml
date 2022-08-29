@@ -2,7 +2,7 @@
 sourceId: managed:sonarcloud
 integrationDefinitionId: '${integration_definition_id}'
 questions: 
-- id: managed-question-sonarcloud-major-bug-issues
+- id: managed-question-what-sonarcloud-major-bug-issues
   title: What are the major SonarCloud bug issues?
   description:
     Return a list of SonarCloud's major bug issues.
