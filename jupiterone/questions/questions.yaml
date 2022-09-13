@@ -9,7 +9,7 @@ questions:
   queries:
    - name: SonarCloud Major Bugs
      query: |
-       FIND UNIQUE sonarcloud_issue WITH (status ~= "OPEN" AND severity ~= "MAJOR" AND type ~= "BUG")
+       FIND sonarcloud_issue WITH (status ~= "OPEN" AND severity ~= "MAJOR" AND type ~= "BUG")
   tags:
    - issue
    - sonarcloud
