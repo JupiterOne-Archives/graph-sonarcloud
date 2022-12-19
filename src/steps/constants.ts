@@ -1,6 +1,8 @@
 import {
   RelationshipClass,
+  RelationshipDirection,
   StepEntityMetadata,
+  StepMappedRelationshipMetadata,
   StepRelationshipMetadata,
 } from '@jupiterone/integration-sdk-core';
 
@@ -18,7 +20,13 @@ export const Steps = {
 };
 
 export const Entities: Record<
-  'ACCOUNT' | 'ORGANIZATION' | 'GROUP' | 'USER' | 'PROJECT' | 'ISSUE',
+  | 'ACCOUNT'
+  | 'ORGANIZATION'
+  | 'GROUP'
+  | 'USER'
+  | 'PROJECT'
+  | 'ISSUE'
+  | 'CODEREPO',
   StepEntityMetadata
 > = {
   ACCOUNT: {
@@ -104,6 +112,12 @@ export const Entities: Record<
       required: ['status', 'severity'],
     },
   },
+  CODEREPO: {
+    resourceName: 'Code Repo',
+    _type: 'CodeRepo',
+    _class: ['CodeRepo'],
+    schema: {},
+  },
 };
 
 export const Relationships: Record<
@@ -136,5 +150,18 @@ export const Relationships: Record<
     sourceType: Entities.PROJECT._type,
     _class: RelationshipClass.HAS,
     targetType: Entities.ISSUE._type,
+  },
+};
+
+export const MappedRelationships: Record<
+  'PROJECT_SCANS_CODEREPO',
+  StepMappedRelationshipMetadata
+> = {
+  PROJECT_SCANS_CODEREPO: {
+    _type: 'sonarcloud_project_scans_coderepo',
+    sourceType: Entities.PROJECT._type,
+    _class: RelationshipClass.SCANS,
+    targetType: Entities.CODEREPO._type,
+    direction: RelationshipDirection.FORWARD,
   },
 };

@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+The following mapped relationship is **now** created:
+
+| Source Entity `_type` | Relationship `_class` | Target Entity `_type` | Direction |
+| --------------------- | --------------------- | --------------------- | --------- |
+| `sonarcloud_project`  | **SCANS**             | `*CodeRepo*`          | FORWARD   |
+
 ## 1.0.0 - 2022-08-05
 
 ### Added

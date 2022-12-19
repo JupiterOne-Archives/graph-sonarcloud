@@ -1,4 +1,8 @@
-import { RelationshipClass, StepSpec } from '@jupiterone/integration-sdk-core';
+import {
+  RelationshipClass,
+  RelationshipDirection,
+  StepSpec,
+} from '@jupiterone/integration-sdk-core';
 import { IntegrationConfig } from '../../../../src/config';
 
 export const projectSpec: StepSpec<IntegrationConfig>[] = [
@@ -22,6 +26,15 @@ export const projectSpec: StepSpec<IntegrationConfig>[] = [
         sourceType: 'sonarcloud_organization',
         _class: RelationshipClass.HAS,
         targetType: 'sonarcloud_project',
+      },
+    ],
+    mappedRelationships: [
+      {
+        _type: 'sonarcloud_project_scans_coderepo',
+        sourceType: 'sonarcloud_project',
+        _class: RelationshipClass.SCANS,
+        targetType: 'CodeRepo',
+        direction: RelationshipDirection.FORWARD,
       },
     ],
     dependsOn: ['fetch-organizations'],

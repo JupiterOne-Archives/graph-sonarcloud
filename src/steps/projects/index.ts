@@ -7,8 +7,14 @@ import {
 import { createAPIClient } from '../../client';
 import { IntegrationConfig } from '../../config';
 import { getOrganizationKey } from '../organizations/converter';
-import { Entities, Relationships, Steps } from '../constants';
 import {
+  Entities,
+  MappedRelationships,
+  Relationships,
+  Steps,
+} from '../constants';
+import {
+  buildProjectRepoMappedRelationship,
   createOrganizationProjectRelationship,
   createProjectEntity,
 } from './converter';
@@ -42,6 +48,12 @@ export async function fetchProjects({
             projectEntity,
           ),
         );
+
+        const projectReportMappedRel =
+          buildProjectRepoMappedRelationship(projectEntity);
+        if (projectReportMappedRel) {
+          await jobState.addRelationship(projectReportMappedRel);
+        }
       },
     );
   });
@@ -53,6 +65,7 @@ export const projectSteps: IntegrationStep<IntegrationConfig>[] = [
     name: 'Fetch Projects',
     entities: [Entities.PROJECT],
     relationships: [Relationships.ORGANIZATION_HAS_PROJECT],
+    mappedRelationships: [MappedRelationships.PROJECT_SCANS_CODEREPO],
     dependsOn: [Steps.ORGANIZATIONS],
     executionHandler: fetchProjects,
   },
