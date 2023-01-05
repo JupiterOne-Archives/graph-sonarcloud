@@ -99,6 +99,14 @@ The following relationships are created:
 | `sonarcloud_organization` | **HAS**               | `sonarcloud_project`  |
 | `sonarcloud_project`      | **HAS**               | `sonarcloud_issue`    |
 
+### Mapped Relationships
+
+The following mapped relationships are created:
+
+| Source Entity `_type` | Relationship `_class` | Target Entity `_type` | Direction |
+| --------------------- | --------------------- | --------------------- | --------- |
+| `sonarcloud_project`  | **SCANS**             | `*CodeRepo*`          | FORWARD   |
+
 <!--
 ********************************************************************************
 END OF GENERATED DOCUMENTATION AFTER BELOW MARKER
