@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.1.0 - 2023-01-05
+
 ### Added
 
 The following mapped relationship is **now** created:
