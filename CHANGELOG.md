@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.1.1 - 2023-01-20
+
 ### Fixed
 
 - Fixed `organization` property value for creating mapped relationships between
