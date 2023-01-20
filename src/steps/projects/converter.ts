@@ -49,7 +49,7 @@ export function buildProjectRepoMappedRelationship(
   projectEntity: Entity,
 ): MappedRelationship | undefined {
   const repoName = projectEntity.name as string | undefined;
-  const projectOrganization = projectEntity.name as string | undefined;
+  const projectOrganization = projectEntity.organization as string | undefined;
 
   if (projectEntity.name && projectEntity.organization) {
     return createMappedRelationship({
