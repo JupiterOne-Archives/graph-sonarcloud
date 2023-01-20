@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `organization` property value for creating mapped relationships between
+  projects and repos.
+
 ## 1.1.0 - 2023-01-05
 
 ### Added
