@@ -11,6 +11,7 @@ import { createProjectIssueRelationship, createIssueEntity } from './converter';
 export async function fetchIssues({
   instance,
   jobState,
+  logger,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
   const apiClient = createAPIClient(instance.config);
 
@@ -24,8 +25,15 @@ export async function fetchIssues({
       await apiClient.iterateProjectIssues(
         projectKey as string,
         async (issue) => {
+          logger.info('Ingested a SonarCloud Issue: ', issue.key);
+
           const issueEntity = await jobState.addEntity(
             createIssueEntity(issue),
+          );
+
+          logger.info(
+            'Adding a sonarcloud_issue entity to jobState',
+            issueEntity._key,
           );
 
           await jobState.addRelationship(
