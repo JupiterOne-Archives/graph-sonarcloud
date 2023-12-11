@@ -23,7 +23,7 @@ export function createProjectEntity(project: SonarCloudProject): Entity {
         _type: Entities.PROJECT._type,
         _class: Entities.PROJECT._class,
         _key: id,
-        key: project.name,
+        key: project.key,
         name: project.name,
         public: project.visibility === 'public',
         qualifier: project.qualifier,
