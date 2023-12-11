@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.2.0 - 2023-12-11
+
+### Fixed
+
+- Fixed project `key` value so we properly ingest sonarcloud_issue entities.
+
 ## 1.1.2 - 2023-12-11
 
 ### Added
