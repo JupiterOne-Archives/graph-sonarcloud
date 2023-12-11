@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.1.2 - 2023-12-11
+
+### Added
+
+- Added additional logs for debugging an issue when ingesting sonarcloud_issue
+  entities.
+
 ## 1.1.1 - 2023-01-20
 
 ### Fixed
