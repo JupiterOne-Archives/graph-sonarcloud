@@ -49,7 +49,6 @@ export function buildProjectRepoMappedRelationship(
   projectEntity: Entity,
 ): MappedRelationship | undefined {
   const repoName = projectEntity.name as string | undefined;
-  const projectOrganization = projectEntity.organization as string | undefined;
 
   if (projectEntity.name && projectEntity.organization) {
     return createMappedRelationship({
@@ -58,11 +57,10 @@ export function buildProjectRepoMappedRelationship(
       _mapping: {
         relationshipDirection: RelationshipDirection.FORWARD,
         sourceEntityKey: projectEntity._key,
-        targetFilterKeys: [['_class', 'name', 'owner']],
+        targetFilterKeys: [['_class', 'name']],
         targetEntity: {
           _class: 'CodeRepo',
           name: repoName,
-          owner: projectOrganization,
         },
         skipTargetCreation: true,
       },
