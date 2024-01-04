@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.3.0 - 2024-01-03
+
+### Change
+
+- Change `sonarcloud_project -SCANS-> CodeRepo` mapping filter
+
 ## 1.2.0 - 2023-12-11
 
 ### Fixed
